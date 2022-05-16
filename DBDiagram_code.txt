@@ -1,0 +1,20 @@
+// Run this code on dbdiagram.io to get diagram
+Table Companies {
+  CompanyID int [pk]
+  CompanyName text
+  CompanyType text
+  CompanyDate int
+}
+
+Table Records {
+  RecordID int [pk]
+  CompanyID int
+  Date int
+  Open float
+  High float
+  Low float
+  Close float
+  Volume int
+}
+
+Ref: Companies.CompanyID > Records.RecordID
