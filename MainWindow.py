@@ -186,7 +186,11 @@ class MainWindow(tk.Tk):
         if parameters.DataFlag_Close.get() == 1:
             selected_params.append("Close")
         if parameters.DataFlag_Volume.get() == 1:
-            selected_params.append("Volume")
+            selected_params = ["Volume"]
+            parameters.DataFlag_Open.set(0)
+            parameters.DataFlag_High.set(0)
+            parameters.DataFlag_Low.set(0)
+            parameters.DataFlag_Close.set(0)
 
         # Pobieranie informacji o wybranych firmach
         selected_companies = []
@@ -213,20 +217,11 @@ class MainWindow(tk.Tk):
         self.pltIndex += 1
         legenda = []
         for i in data.keys():
-            plt.plot( data[i][0], data[i][1] )
+            plt.plot(data[i][0], data[i][1])
             legenda.append(i)
         plt.title('Dane Giełdowe')
         plt.legend(legenda)
         plt.grid(True)
-        # Tworzenie wyświetlanej listy dat osi x
-        if len(data) != 0:
-            dateskey = list(data.keys())[0]
-            dates = data[dateskey][0]
-            mask = np.linspace(0, len(dates) - 1, 6).astype(int)
-            dates = [dates[i] for i in mask]
-            datesll = ['%i' % i for i in dates]
-            print(dates)
-            plt.xticks(dates, datesll)
         # Pushowanie wykresu
         self.widgets["chart1"].replace_plot(newPlot)
 

@@ -1,12 +1,13 @@
 """
 Plik zawiera funkcje i klasy pozwalające na komunikowanie się z bazą danych
 """
+from datetime import datetime
+
 import sqlalchemy as sql
 from sqlalchemy import create_engine, select, MetaData, Table
 from sqlalchemy import Column, Text, Integer, Float, ForeignKey, PrimaryKeyConstraint
 from sqlalchemy.orm import sessionmaker, relationship
 from sqlalchemy.ext.declarative import declarative_base
-
 
 # Zmienne globalne
 dbName = "StockData.db"
@@ -35,6 +36,7 @@ def IntDateToStr(IntDate):
         (str): Data w formacie string 'YYYY-MM-DD'
     """
     return str(IntDate)[:4] + '-' + str(IntDate)[4:6] + '-' + str(IntDate)[6:]
+
 
 def StrDateToInt(StrDate):
     """
@@ -68,10 +70,10 @@ class Records(Base):
     __tablename__ = 'Records'
     RecordID = Column(Integer, primary_key=True)
     CompanyID = Column(Integer, ForeignKey('Companies.CompanyID'))
-    Date  = Column(Integer)
-    Open  = Column(Float)
-    High  = Column(Float)
-    Low   = Column(Float)
+    Date = Column(Integer)
+    Open = Column(Float)
+    High = Column(Float)
+    Low = Column(Float)
     Close = Column(Float)
     Volume = Column(Integer)
 
@@ -87,7 +89,7 @@ def GetCompaniesList():
     return [mapper_results[i][0] for i in range(len(mapper_results))]
 
 
-def GetCompaniesInfo(CompaniesList = []):
+def GetCompaniesInfo(CompaniesList=[]):
     """
     Funkcja zwraca listę skrótu informacji o firmach
     Args:
@@ -97,12 +99,12 @@ def GetCompaniesInfo(CompaniesList = []):
     """
     result = {}
     for company in CompaniesList:
-        info = session.query(Companies).filter_by(CompanyName = company).all()[0].__str__()
+        info = session.query(Companies).filter_by(CompanyName=company).all()[0].__str__()
         result[company] = info
     return result
 
 
-def GetData(CompaniesList = [], FieldsList = [], DateRange = [20220101, 20220407]):
+def GetData(CompaniesList=[], FieldsList=[], DateRange=[20220101, 20220407]):
     """
     Funkcja zwraca listę obiektów Records przefiltrowaną względem pól i zakresu daty
     Args:
@@ -115,31 +117,36 @@ def GetData(CompaniesList = [], FieldsList = [], DateRange = [20220101, 20220407
     result = {}
     for company in CompaniesList:
         # Pozyskiwanie ID firmy
-        id = session.query(Companies).filter_by(CompanyName = company).all()[0].CompanyID
-        companydata = session.query(Records)\
-        .filter_by(CompanyID = id)\
-        .filter(Records.Date > DateRange[0])\
-        .filter(Records.Date < DateRange[1])\
-        .all()
+        id = session.query(Companies).filter_by(CompanyName=company).all()[0].CompanyID
+        companydata = session.query(Records) \
+            .filter_by(CompanyID=id) \
+            .filter(Records.Date > DateRange[0]) \
+            .filter(Records.Date < DateRange[1]) \
+            .all()
         # Pozyskiwanie elementów
         if "Open" in FieldsList:
-            datX = [companydata[i].Date for i in range(len(companydata))]
+            datX = [DateConverter(companydata[i].Date) for i in range(len(companydata))]
             datY = [companydata[i].Open for i in range(len(companydata))]
-            result[company + ":Open"] = (datX, datY)
+            result[company + ":Open [PLN]"] = (datX, datY)
         if "High" in FieldsList:
-            datX = [companydata[i].Date for i in range(len(companydata))]
+            datX = [DateConverter(companydata[i].Date) for i in range(len(companydata))]
             datY = [companydata[i].High for i in range(len(companydata))]
-            result[company + ":High"] = (datX, datY)
+            result[company + ":High [PLN]"] = (datX, datY)
         if "Low" in FieldsList:
-            datX = [companydata[i].Date for i in range(len(companydata))]
+            datX = [DateConverter(companydata[i].Date) for i in range(len(companydata))]
             datY = [companydata[i].Low for i in range(len(companydata))]
-            result[company + ":Low"] = (datX, datY)
+            result[company + ":Low [PLN]"] = (datX, datY)
         if "Close" in FieldsList:
-            datX = [companydata[i].Date for i in range(len(companydata))]
+            datX = [DateConverter(companydata[i].Date) for i in range(len(companydata))]
             datY = [companydata[i].Close for i in range(len(companydata))]
-            result[company + ":Close"] = (datX, datY)
+            result[company + ":Close [PLN]"] = (datX, datY)
         if "Volume" in FieldsList:
-            datX = [companydata[i].Date for i in range(len(companydata))]
+            datX = [DateConverter(companydata[i].Date) for i in range(len(companydata))]
             datY = [companydata[i].Volume for i in range(len(companydata))]
-            result[company + ":Volume"] = (datX, datY)
+            result[company + ":Volume [Ilość]"] = (datX, datY)
     return result
+
+
+def DateConverter(date):
+    date_str = IntDateToStr(date)
+    return datetime.strptime(date_str, "%Y-%m-%d")
