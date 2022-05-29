@@ -100,7 +100,7 @@ class MainWindow(tk.Tk):
         self.widgets["endDateEntry"].config(textvariable=parameters.DataFlag_EndTime)
         self.widgets["endDateEntry"].insert(0, "2022-02-01")
         self.widgets["endDateEntry"].grid(row=2, column=2)
-        self.widgets["dateFormatLabel"] = factory.getLabel(self.widgets["mChoiceFrame"], "Zakres od 2022-01-01 do 2022-04-26")
+        self.widgets["dateFormatLabel"] = factory.getLabel(self.widgets["mChoiceFrame"], "Dostępny zakres od 2022-01-01 do 2022-04-26")
         self.widgets["dateFormatLabel"].grid(row=3, column=1, columnspan=2)
         self.widgets["separator1"] = factory.getSeparator(self.widgets["mChoiceFrame"])
         self.widgets["separator1"].grid(row=4, column=1, columnspan=2, sticky="ew")
